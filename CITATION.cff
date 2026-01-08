@@ -1,0 +1,58 @@
+cff-version: 1.2.0
+title: amenity-complexity
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - family-names: Renninger
+    given-names: Andrew
+  - family-names: Juhász
+    given-names: Sándor
+repository-code: https://github.com/arenninger/amenity-complexity
+license: MIT
+version: 0.1.0
+abstract: >-
+  Tools for extracting points of interest (POIs) from Foursquare
+  and Overture Places, aggregating them to spatial units (e.g., H3),
+  and computing amenity complexity for any region.
+keywords:
+  - amenity complexity
+  - economic complexity
+  - urban analytics
+  - points of interest
+  - geospatial
+  - H3
+references:
+  - type: article
+    authors:
+      - family-names: Juhász
+        given-names: Sándor
+      - family-names: Pintér
+        given-names: Gergő
+      - family-names: Kovács
+        given-names: Ádám J.
+      - family-names: Borber
+        given-names: Gergely
+      - family-names: Lengyel
+        given-names: Balázs
+    title: "Amenity complexity and urban locations of socio-economic mixing"
+    journal: EPJ Data Science
+    year: 2023
+    volume: 12
+    issue: 34
+    doi: 10.1140/epjds/s13688-023-00413-6
+  - type: article
+    authors:
+      - family-names: Hidalgo
+        given-names: César A.
+      - family-names: Hausmann
+        given-names: Ricardo
+    title: "The building blocks of economic complexity"
+    journal: Proceedings of the National Academy of Sciences
+    year: 2009
+    volume: 106
+    issue: 26
+    start: 10570
+    end: 10575
+    doi: 10.1073/pnas.0900943106

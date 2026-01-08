@@ -122,5 +122,23 @@ Both methods return unit-side and category-side scores; in `profile.units` these
 
 ## References
 
-- Juhász, S. et al. (2023). *Amenity complexity and urban locations of socio-economic mixing.* EPJ Data Science, 12:34. https://doi.org/10.1140/epjds/s13688-023-00413-6  
+- Juhász, S. et al. (2023). *Amenity complexity and urban locations of socio-economic mixing.* EPJ Data Science, 12:34. https://doi.org/10.1140/epjds/s13688-023-00413-6
 - Hidalgo, C. A., & Hausmann, R. (2009). *The building blocks of economic complexity.* PNAS, 106(26), 10570–10575. https://doi.org/10.1073/pnas.0900943106
+
+## Citation
+
+If you use this software in your research, please cite it:
+
+```bibtex
+@software{renninger_juhasz_amenity_complexity,
+  author = {Renninger, Andrew and Juhász, Sándor},
+  title = {amenity-complexity},
+  url = {https://github.com/arenninger/amenity-complexity},
+  version = {0.1.0},
+  license = {MIT}
+}
+```
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

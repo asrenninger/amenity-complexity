@@ -4,6 +4,30 @@ version = "0.1.0"
 description = "Tools for computing amenity complexity in regions using Foursquare/Overture data"
 readme = "README.md"
 requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+    {name = "Andrew Renninger"},
+    {name = "Sándor Juhász"},
+]
+keywords = [
+    "amenity complexity",
+    "economic complexity",
+    "urban analytics",
+    "points of interest",
+    "geospatial",
+    "H3",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: GIS",
+]
 dependencies = [
     "duckdb>=0.9.0",
     "pandas>=2.0.0",
@@ -31,6 +55,11 @@ analysis = [
 
 [project.scripts]
 amenity-complexity = "amenity_complexity.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/arenninger/amenity-complexity"
+Repository = "https://github.com/arenninger/amenity-complexity"
+Issues = "https://github.com/arenninger/amenity-complexity/issues"
 
 [build-system]
 requires = ["setuptools>=61.0"]
