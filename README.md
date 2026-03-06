@@ -52,6 +52,60 @@ profile = compute_complexity(
 
 ```
 
+## Visualizing Complexity
+
+You can generate a comprehensive dashboard (Figure 2 style) for any city using `summary_panel`. This visualizes the distribution, spatial diversity, similarity matrices, and complexity-diversity relationships.
+
+```python
+import pickle
+from sklearn.metrics.pairwise import cosine_similarity
+from amenity_complexity.plot import summary_panel
+
+# 1. Load your city profile (e.g., Singapore)
+with open("data/processed/050_Singapore_Singapore_res8_profile.pkl", 'rb') as f:
+    profile = pickle.load(f)
+
+# 2. Compute Similarity Matrices
+# The profile object typically contains the filtered matrix M in `profile.M`
+M = profile.M
+Mnn = cosine_similarity(M.values)
+Maa = cosine_similarity(M.values.T)
+
+# 3. Generate Dashboard
+summary_panel(profile, M, Mnn, Maa, "Singapore", "Singapore_Dashboard.png")
+```
+
+![Singapore Complexity Dashboard](assets/Singapore_Complexity_Dashboard_Res8.png)
+
+
+## Larger regions
+
+The package is equally capable of computing amenity complexity at the scale of entire countries. You can use standard geospatial libraries like `geopandas` alongside the natural earth dataset to extract national bounding boxes.
+
+```python
+import geopandas as gpd
+from amenity_complexity.io import pois_from_overture
+from amenity_complexity.geo import pois_to_h3
+from amenity_complexity.core import compute_complexity
+
+# 1) Load country borders (e.g., from Natural Earth)
+world = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
+uk = world[world.name == "United Kingdom"]
+
+# 2) Extract the bounding box
+minx, miny, maxx, maxy = uk.total_bounds
+bbox = (minx, miny, maxx, maxy)
+
+# 3) Fetch POIs and compute complexity as usual
+pois = pois_from_overture(bbox=bbox)
+pois = pois_to_h3(pois, resolution=8)
+profile = compute_complexity(pois, unit_col="h3_lvl8", category_col="category")
+```
+
+Computing this across an entire country allows you to analyze national hierarchies of amenities and generate 3D density maps (like the UK example below) that highlight complex urban clusters.
+
+![UK Amenity Complexity 3D Map](assets/uk_3d_map.png)
+
 ## Installation
 
 ```bash
@@ -110,7 +164,10 @@ Both methods return unit-side and category-side scores; in `profile.units` these
 
 - `amenity_complexity.core`
   - `compute_complexity(...)` (end-to-end)
-  - lower-level building blocks: `count_matrix`, `rca`, `specialization`, `complexity`
+  - `count_matrix`, `rca`, `specialization`, `complexity` (lower-level building blocks)
+
+- `amenity_complexity.plot`
+  - `summary_panel(...)` (visualization of the process)
 
 ## Notes
 
