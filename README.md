@@ -12,7 +12,7 @@ This example uses a **Functional Urban Area (FUA)** to define the region, fetche
 
 ```python
 
-from amenity_complexity.geo import load_fuas, bbox_from_fua, pois_to_h3
+from amenity_complexity.geo import load_fuas, bbox_from_geometry, pois_to_h3
 from amenity_complexity.io import pois_from_foursquare
 from amenity_complexity.core import compute_complexity
 
@@ -22,12 +22,7 @@ city = "Vienna"
 row = fuas.loc[fuas["eFUA_name"] == city].iloc[0]
 
 # 2) Convert the FUA polygon to a buffered bbox (lon/lat)
-bbox = bbox_from_fua(
-    fuas,
-    fua_id_col="eFUA_ID",
-    fua_id=str(row["eFUA_ID"]),
-    buffer_m=5000,
-)
+bbox = bbox_from_geometry(row.geometry, buffer_m=5000)
 
 # 3) Fetch POIs (remote Parquet on public S3 via DuckDB)
 pois = pois_from_foursquare(bbox=bbox, trim_cols=True)
@@ -47,7 +42,6 @@ profile = compute_complexity(
     pois,
     unit_col=f"h3_lvl{res}",
     category_col="sub_category",  # or "top_category" for a coarser taxonomy
-    methods=("juhasz", "hidalgo"),
 )
 
 ```
@@ -57,13 +51,26 @@ profile = compute_complexity(
 You can generate a comprehensive dashboard (Figure 2 style) for any city using `summary_panel`. This visualizes the distribution, spatial diversity, similarity matrices, and complexity-diversity relationships.
 
 ```python
-import pickle
 from sklearn.metrics.pairwise import cosine_similarity
+from amenity_complexity.geo import load_fuas, get_fua, bbox_from_geometry, pois_to_h3
+from amenity_complexity.io import pois_from_overture
+from amenity_complexity.core import compute_complexity
 from amenity_complexity.plot import summary_panel
+from amenity_complexity.poi import relevel_pois
 
-# 1. Load your city profile (e.g., Singapore)
-with open("data/processed/050_Singapore_Singapore_res8_profile.pkl", 'rb') as f:
-    profile = pickle.load(f)
+# 1. Fetch data for Singapore from Overture
+fuas = load_fuas("data/GHS_FUA_UCDB2015_GLOBE_R2019A_54009_1K_V1_0.gpkg")
+row = get_fua(fuas, "Singapore")
+bbox = bbox_from_geometry(row.geometry, buffer_m=5000)
+
+pois = pois_from_overture(bbox=bbox, trim_cols=True)
+
+# 2. Automatically relevel rare POI categories up the Overture taxonomy tree
+pois = relevel_pois(pois, category_col="sub_category", min_count=10)
+
+pois = pois_to_h3(pois, resolution=8, lat_col="latitude", lon_col="longitude")
+
+profile = compute_complexity(pois, unit_col="h3_lvl8", category_col="sub_category")
 
 # 2. Compute Similarity Matrices
 # The profile object typically contains the filtered matrix M in `profile.M`
@@ -138,19 +145,9 @@ We adapt the “economic complexity” toolkit to intra-urban amenities:
 
 ## Methods implemented
 
-`compute_complexity(..., methods=("juhasz", "hidalgo"))` runs two closely related variants:
+`compute_complexity(...)` calculates complexity following the economic complexity tradition introduced by **Hidalgo & Hausmann (2009)**, matching the exact logic implemented in the `py-ecomplexity` library (Method of Reflections -> normalized operator -> eigenvectors -> ECI/PCI normalizations).
 
-- **`juhasz`**: “amenity complexity 
-  This matches the amenity / neighborhood complexity construction used by **Juhász et al. (2023)**, where complexity is read from the structure of the binary RCA matrix via the second eigenvector of similarity.  
-  Paper: *Amenity complexity and urban locations of socio-economic mixing* (EPJ Data Science, 2023).  
-  https://doi.org/10.1140/epjds/s13688-023-00413-6
-
-- **`hidalgo`**: economic complexity
-  This follows the economic complexity tradition introduced by **Hidalgo & Hausmann (2009)** (RCA → binary **M** → reflections / eigenvectors), using a normalized operator so degree (diversity / ubiquity) is accounted for more explicitly.  
-  Paper: *The building blocks of economic complexity* (PNAS, 2009).  
-  https://doi.org/10.1073/pnas.0900943106
-
-Both methods return unit-side and category-side scores; in `profile.units` these appear as `complexity_juhasz` and `complexity_hidalgo` (and similarly in `profile.categories`). Scores are z-scored and sign-oriented for stable interpretation.
+Both method returns unit-side and category-side scores; in `profile.units` these appear as a `complexity` column (and similarly in `profile.categories`). Scores are z-scored and sign-oriented for stable interpretation.
 
 ## API overview
 
